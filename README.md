@@ -2,7 +2,7 @@
 
 ## Hello World!
 
-This is my personal project, [weather app](https://app.netlify.com/sites/frosty-wiles-253d3b/overview).
+This is my personal project, [weather app](https://frosty-wiles-253d3b.netlify.com/).
 
 This project I designed in [Figma](https://www.figma.com).
 
