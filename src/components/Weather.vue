@@ -82,18 +82,21 @@
 </template>
 
 <script>
+
 export default {
-  name: "App",
+  name: 'App',
   data() {
     return {
-      api_key: "d2a9887d08726ec158f84a1205d0b8f3",
-      url_base: "https://api.openweathermap.org/data/2.5/",
-      query: "",
-      weather_img: "",
+      api_key: 'd2a9887d08726ec158f84a1205d0b8f3',
+      url_base: 'https://api.openweathermap.org/data/2.5/',
+      query: '',
+      weather_img: '',
+      city_id: '',
       weather_default_ids: {
-        id_1: "3067696",
-        id_2: "3078610",
-        id_3: "3068799"
+        id_1: 3067696,
+        id_2: 3078610,
+        id_3: 3068799,
+        last_id: 3
       },
       weather_search_res: {},
       weather_default_res: {}
@@ -104,9 +107,9 @@ export default {
      * Get weather based on user search or default
      */
     getWeather(e) {
-      if ((e.key == "Enter" || e.type == "click") && this.query != "") {
+      if ((e.key == 'Enter' || e.type == 'click') && this.query != '') {
         this.getSearchWeather();
-      } else if (e == "default") {
+      } else if (e == 'default') {
         this.getDefaultWeather();
       }
     },
@@ -128,9 +131,14 @@ export default {
      * Search for default weather
      */
     getDefaultWeather() {
-      fetch(
-        `${this.url_base}group?id=${this.weather_default_ids.id_1},${this.weather_default_ids.id_2},${this.weather_default_ids.id_3}&units=metric&appid=${this.api_key}`
-      )
+      let defaultWeather = JSON.parse(localStorage.getItem('defaultWeather'));
+      var url;
+      if (defaultWeather) {
+        url = `${this.url_base}group?id=${defaultWeather.id_1},${defaultWeather.id_2},${defaultWeather.id_3}&units=metric&appid=${this.api_key}`;
+      } else {
+        url = `${this.url_base}group?id=${this.weather_default_ids.id_1},${this.weather_default_ids.id_2},${this.weather_default_ids.id_3}&units=metric&appid=${this.api_key}`;
+      }
+      fetch(url)
         .then(res => {
           return res.json();
         })
@@ -141,38 +149,77 @@ export default {
      * Set the search result
      */
     setSearchResults(results) {
-      if (results.cod == "400" || results.cod == "404") {
+      if (results.cod == '400' || results.cod == '404') {
         this.weather_search_res = {};
         this.weather_default_res = {};
-        this.weather_search_res.message = "City not found";
-        this.weather_search_res.main = "error";
+        this.weather_search_res.message = 'City not found';
+        this.weather_search_res.main = 'error';
       } else {
         this.weather_search_res = results;
         this.city_id = results.id;
         this.weather_default_res = null;
         let img_src;
         switch (results.weather[0].main) {
-          case "Rain":
-            img_src = "rain";
+          case 'Rain':
+            img_src = 'rain';
             break;
-          case "Clouds":
-            img_src = "clouds";
+          case 'Clouds':
+            img_src = 'clouds';
             break;
-          case "Clear":
-            img_src = "clear_sky";
+          case 'Clear':
+            img_src = 'clear_sky';
             break;
-          case "Thunderstorm":
-            img_src = "thunderstorm";
+          case 'Thunderstorm':
+            img_src = 'thunderstorm';
             break;
-          case "Snow":
-            img_src = "snow";
+          case 'Snow':
+            img_src = 'snow';
             break;
-          case "Drizzle":
-            img_src = "drizzle";
+          case 'Drizzle':
+          case 'Fog':
+          case 'Mist':
+            img_src = 'drizzle';
             break;
         }
-        this.weather_img = "weather-img/" + img_src + ".png";
+        this.weather_img = 'weather-img/' + img_src + '.png';
       }
+    },
+
+    /**
+     * Set favorite city
+     */
+    setFavoritePlace() {
+      var weatherStorage = JSON.parse(localStorage.getItem('defaultWeather'));
+      localStorage.removeItem('defaultWeather');
+      if (weatherStorage) {
+        switch (weatherStorage.last_id) {
+          case 1:
+            this.weather_default_ids.last_id = 2;
+            this.weather_default_ids.id_2 = this.city_id;
+            break;
+          case 2:
+            this.weather_default_ids.last_id = 3;
+            this.weather_default_ids.id_3 = this.city_id;
+            break;
+          case 3:
+            this.weather_default_ids.last_id = 1;
+            this.weather_default_ids.id_1 = this.city_id;
+            break;
+        }
+      } else {
+        this.weather_default_ids.last_id = 1;
+        this.weather_default_ids.id_1 = this.city_id;
+      }
+
+      localStorage.setItem(
+        'defaultWeather',
+        JSON.stringify(this.weather_default_ids)
+      );
+
+      document.getElementById('successCheck').style.display = 'block';
+      setTimeout( function() {
+        document.getElementById('successCheck').style.display = 'none';
+      }, 1800)
     },
 
     /**
@@ -188,10 +235,10 @@ export default {
      */
     date() {
       var today = new Date();
-      var dd = String(today.getDate()).padStart(2, "0");
-      var mm = String(today.getMonth() + 1).padStart(2, "0");
+      var dd = String(today.getDate()).padStart(2, '0');
+      var mm = String(today.getMonth() + 1).padStart(2, '0');
       var yyyy = today.getFullYear();
-      today = dd + "." + mm + "." + yyyy;
+      today = dd + '.' + mm + '.' + yyyy;
       return today;
     },
 
@@ -199,11 +246,13 @@ export default {
      * Clear the search result
      */
     clearSearch() {
-      this.getWeather("default");
+      this.city_id = null;
+      this.getWeather('default');
     }
   },
   beforeMount() {
-    this.getWeather("default");
+    this.city_id = null;
+    this.getWeather('default');
   }
 };
 </script>
