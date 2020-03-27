@@ -1,9 +1,18 @@
-@keyframes rotate_button {
-  0% {
-    rotate: (0deg);
-  }
-
+@keyframes stroke {
   100% {
-    rotate: (360deg);
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes scale {
+  0%, 100% {
+    transform: none;
+  }
+  50% {
+    transform: scale3d(1.1, 1.1, 1);
+  }
+}
+@keyframes fill {
+  100% {
+    box-shadow: inset 0px 0px 0px 3px $blue;
   }
 }

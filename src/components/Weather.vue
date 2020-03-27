@@ -1,8 +1,22 @@
 <template>
   <div id="weather_main">
+    <div id="successCheck">
+      <div>
+        <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52"><circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none"/><path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/></svg>
+      </div>
+    </div>
+
     <main>
       <div class="search_box">
-        <button class="clear_button" @click="clearSearch">X</button>
+        <button class="header_button clear_button" @click="clearSearch">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        <button
+          v-if="typeof weather_search_res.main != 'undefined'"
+          @click="setFavoritePlace"
+          class="header_button favorite_button"
+          title="Like"
+        ><i class="far fa-heart"></i></button>
         <input
           id="search_input"
           type="text"
@@ -57,12 +71,13 @@
           </tr>
         </table>
       </div>
+
+      <footer>
+        <div class="date">
+          <p>{{ date() }}</p>
+        </div>
+      </footer>
     </main>
-    <footer>
-      <div class="date">
-        <p>{{ date() }}</p>
-      </div>
-    </footer>
   </div>
 </template>
 

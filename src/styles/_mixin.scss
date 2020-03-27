@@ -1,0 +1,13 @@
+@mixin header_button {
+  width: 2rem;
+  height: 2rem;
+  background-color: transparent;
+  border: 1px solid $blue;
+  color: $blue;
+  font-size: 1.2rem;
+  border-radius: 50%;
+}
+
+@mixin button_hover {
+  box-shadow: 0 0 15px $blue;
+}
